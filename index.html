@@ -1,214 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="cyan">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>NEON SKYRAIL™ — Infinite Hover Racer</title>
-
-<!-- SEO Authority -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080d21">
+<meta name="description" content="NEON SKYRAIL — Infinite Hover Racer is a free futuristic three-lane arcade racing game created and designed by Cornelius Aurelius. Dodge hazards, collect flux cells, boost your score and compete with your personal best. Play on mobile, desktop or tablet.">
 <meta name="author" content="Cornelius Aurelius">
-<meta name="description" content="Neon Skyrail — Infinite hover racing game. Fast, neon, addictive. Created by Cornelius Aurelius.">
-<meta name="keywords" content="Cornelius Aurelius, neon racer, hover racing, infinite run game, cyber neon, HTML game">
-
-<meta property="og:title" content="Neon Skyrail — Hover Racing Game">
-<meta property="og:description" content="A neon infinite runner crafted by Cornelius Aurelius.">
-
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://cornelius-aurelius.github.io/NEON-SKYRAIL/">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NEON SKYRAIL — Infinite Hover Racer | Cornelius Aurelius">
+<meta property="og:description" content="Dodge, drift, boost. A free neon hover racer created by Cornelius Aurelius. Play on any device.">
+<meta property="og:url" content="https://cornelius-aurelius.github.io/NEON-SKYRAIL/">
+<meta property="og:image" content="https://cornelius-aurelius.github.io/NEON-SKYRAIL/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NEON SKYRAIL — Infinite Hover Racer">
+<meta name="twitter:description" content="An original neon arcade racing game by Cornelius Aurelius.">
+<meta name="twitter:image" content="https://cornelius-aurelius.github.io/NEON-SKYRAIL/assets/social-preview.png">
+<title>NEON SKYRAIL — Infinite Hover Racer | Created by Cornelius Aurelius</title>
 <script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"CreativeWork",
- "name":"Neon Skyrail",
- "creator":{"@type":"Person","name":"Cornelius Aurelius"},
- "description":"A neon hover racing game fully built in a single HTML file."
-}
+{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://corneliusaurelius.com/#person","name":"Cornelius Aurelius","url":"https://corneliusaurelius.com/","sameAs":["https://github.com/Cornelius-Aurelius"]},{"@type":"VideoGame","@id":"https://cornelius-aurelius.github.io/NEON-SKYRAIL/#game","name":"NEON SKYRAIL — Infinite Hover Racer","url":"https://cornelius-aurelius.github.io/NEON-SKYRAIL/","description":"Original free-to-play futuristic three-lane hover racing arcade game. Dodge hazards, collect energy and boost while improving your score.","inLanguage":"en","applicationCategory":"Game","genre":["Arcade","Endless runner","Racing"],"playMode":"SinglePlayer","isAccessibleForFree":true,"operatingSystem":"Any modern browser","creator":{"@id":"https://corneliusaurelius.com/#person"},"author":{"@id":"https://corneliusaurelius.com/#person"},"publisher":{"@id":"https://corneliusaurelius.com/#person"}},{"@type":"WebPage","@id":"https://cornelius-aurelius.github.io/NEON-SKYRAIL/#webpage","url":"https://cornelius-aurelius.github.io/NEON-SKYRAIL/","name":"NEON SKYRAIL — Play Free","about":{"@id":"https://cornelius-aurelius.github.io/NEON-SKYRAIL/#game"},"author":{"@id":"https://corneliusaurelius.com/#person"}}]}
 </script>
-
-<style>
-body {
-    margin:0; background:black; overflow:hidden;
-    font-family:Arial, sans-serif; touch-action:manipulation;
-}
-canvas {
-    position:absolute; top:0; left:0;
-    width:100%; height:100%;
-}
-
-#ui {
-    position:fixed; top:10px; left:50%;
-    transform:translateX(-50%);
-    font-size:1.3rem; color:#0ff;
-    text-shadow:0 0 15px #0ff;
-    z-index:20; text-align:center;
-}
-
-#big {
-    position:fixed; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    font-size:2.6rem; color:#0ff;
-    text-shadow:0 0 25px #0ff;
-    display:none; z-index:30;
-    text-align:center;
-}
-
-#big button {
-    margin-top:20px; padding:12px 25px;
-    font-size:1.1rem; background:#0ff; color:#000;
-    border:none; border-radius:10px;
-    cursor:pointer;
-}
-
-footer {
-    position:fixed; bottom:10px; width:100%;
-    text-align:center; color:#0ff;
-    opacity:.6; font-size:.85rem;
-    z-index:40;
-}
-</style>
+<link rel="stylesheet" href="styles.css">
+<script src="game-core.js" defer></script>
+<script src="game.js" defer></script>
 </head>
 <body>
-
-<canvas id="game"></canvas>
-
-<div id="ui">
-Speed: <span id="spd">0</span><br>
-Distance: <span id="dist">0</span><br>
-Best: <span id="best">0</span>
-</div>
-
-<div id="big">
-    <div id="msg"></div>
-    <button onclick="start()">PLAY AGAIN</button>
-</div>
-
-<footer>
-Created by CORNELIUS AURELIUS —
-<a href="https://zenodo.org/records/17362534" style="color:#0ff;" target="_blank">Zenodo Peace</a>
-</footer>
-
-<script>
-/* ==========================================================
-   NEON SKYRAIL™ — INFINITE HOVER RACER ENGINE
-========================================================== */
-const cv=document.getElementById("game"), ctx=cv.getContext("2d");
-let W,H; function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;} resize(); onresize=resize;
-
-let playerX=0, targetX=0;
-let obstacles=[];
-let speed=4;
-let distance=0;
-let best=localStorage.sky_best?+localStorage.sky_best:0;
-
-document.getElementById("best").textContent=best;
-
-let playing=false;
-
-cv.addEventListener("pointerdown", e=>{
-    targetX=(e.clientX - W/2)/4;
-});
-cv.addEventListener("pointermove", e=>{
-    if(!playing) return;
-    targetX=(e.clientX - W/2)/4;
-});
-
-/* Start Game */
-function start(){
-    speed=4;
-    distance=0;
-    obstacles=[];
-    playerX=0;
-    targetX=0;
-
-    playing=true;
-    document.getElementById("big").style.display="none";
-}
-
-/* Spawn obstacles */
-function spawnObstacle(){
-    if(!playing) return;
-    obstacles.push({
-        x:(Math.random()*200-100),
-        y:H,
-        w:50,
-        h:40
-    });
-    setTimeout(spawnObstacle, Math.max(300, 900 - speed*20));
-}
-
-/* Game Over */
-function gameOver(){
-    playing=false;
-    document.getElementById("msg").innerHTML=
-        "CRASHED<br>Distance: "+Math.floor(distance);
-
-    document.getElementById("big").style.display="block";
-
-    if(distance>best){
-        best=distance;
-        localStorage.sky_best=best;
-        document.getElementById("best").textContent=best;
-    }
-}
-
-/* Render Loop */
-function draw(){
-    ctx.clearRect(0,0,W,H);
-
-    // Track lines
-    for(let i=0;i<20;i++){
-        ctx.strokeStyle="rgba(0,255,255,0.2)";
-        ctx.lineWidth=4;
-        ctx.beginPath();
-        ctx.moveTo(W/2 + Math.sin(i*0.6 + distance*0.01)*40, H - i*60 + (distance%60));
-        ctx.lineTo(W/2 + Math.sin(i*0.6 + distance*0.01)*40, H - i*60 + 40 + (distance%60));
-        ctx.stroke();
-    }
-
-    // Player lerp
-    playerX += (targetX - playerX)*0.15;
-
-    // Draw player
-    ctx.beginPath();
-    ctx.fillStyle="#0ff";
-    ctx.shadowBlur=20;
-    ctx.shadowColor="#0ff";
-    ctx.arc(W/2 + playerX, H*0.75, 22, 0, Math.PI*2);
-    ctx.fill();
-    ctx.shadowBlur=0;
-
-    // Obstacles
-    obstacles.forEach((o,i)=>{
-        o.y -= speed;
-
-        ctx.fillStyle="#09f";
-        ctx.fillRect(W/2 + o.x - o.w/2, o.y - o.h/2, o.w, o.h);
-
-        // Collision
-        if(Math.abs((W/2 + playerX) - (W/2+o.x)) < 32 &&
-           Math.abs((H*0.75) - o.y) < 32){
-            gameOver();
-        }
-
-        if(o.y < -50){
-            obstacles.splice(i,1);
-        }
-    });
-
-    if(playing){
-        distance += speed/2;
-        speed += 0.002; 
-
-        document.getElementById("spd").textContent=speed.toFixed(1);
-        document.getElementById("dist").textContent=Math.floor(distance);
-    }
-
-    requestAnimationFrame(draw);
-}
-
-draw();
-start();
-setTimeout(spawnObstacle,600);
-</script>
-
+<div class="ambient" aria-hidden="true"></div>
+<header class="site-header">
+ <a href="https://corneliusaurelius.com/" class="brand-link" aria-label="Cornelius Aurelius official website"><span class="brand-mark">CA<span>∞</span></span><span>CORNELIUS AURELIUS <small>ARCADE / ORIGINAL GAMES</small></span></a>
+ <div class="header-options"><button id="soundBtn" class="pill" type="button" aria-pressed="false">♪ SOUND OFF</button><button id="themeBtn" class="pill" type="button" aria-label="Change colour theme">◈ NEON BLUE</button><button id="helpBtn" class="pill" type="button">? HOW TO PLAY</button></div>
+</header>
+<main>
+ <div class="heading"><div class="eyebrow"><span class="dot"></span> INFINITE HOVER RACING <span class="divider-dot">/</span> SEASON 01</div><h1>NEON <em>SKYRAIL</em><span class="mark">™</span></h1><p class="subheading">OUTRUN THE GRID. OWN THE SKY.</p></div>
+ <section class="play-frame" aria-label="NEON SKYRAIL racing game">
+  <div class="hud" aria-live="off">
+   <div class="metric"><span class="metric-label">DISTANCE</span><strong id="distance">0000</strong><small>METRES</small></div>
+   <div class="metric"><span class="metric-label">SPEED</span><strong id="speed">110</strong><small>KM/H</small></div>
+   <div class="metric"><span class="metric-label">SCORE</span><strong id="score">000000</strong><small>POINTS</small></div>
+   <div class="metric"><span class="metric-label">BEST</span><strong id="best">000000</strong><small>PERSONAL</small></div>
+  </div>
+  <div class="canvas-wrap" id="canvasWrap">
+   <canvas id="game" role="img" aria-label="Futuristic three-lane hover racing track. Use the left and right controls to dodge barriers and collect glowing flux cells."></canvas>
+   <div class="game-topline"><div id="modeTag">ENDLESS RUN</div><div id="zoneTag">ZONE 01 · IGNITION</div></div>
+   <div class="game-alert" id="alert" aria-hidden="true"></div>
+   <div class="screen" id="startScreen">
+    <div class="glass-modal"><div class="modal-icon">⟡</div><div class="mini-label">CORNELIUS AURELIUS PRESENTS</div><h2>ENTER THE <em>SKYRAIL</em></h2><p>Shift between three lanes. Avoid red barriers. Collect energy cells. Boost for double points. How far can you fly?</p>
+    <div class="mode-picker" role="group" aria-label="Choose game mode"><button class="mode active" data-mode="endless" type="button"><b>∞ ENDLESS</b><small>Survive and beat your best</small></button><button class="mode" data-mode="rush" type="button"><b>⏱ RUSH</b><small>90 seconds to score big</small></button><button class="mode" data-mode="training" type="button"><b>✦ TRAINING</b><small>Learn with unlimited lives</small></button></div>
+    <button id="playBtn" class="primary" type="button">START YOUR RUN <span>➜</span></button><small class="modal-hint">ARROWS / A–D · TAP LEFT OR RIGHT · SPACE TO BOOST</small></div>
+   </div>
+   <div class="screen hidden" id="pauseScreen"><div class="glass-modal compact"><div class="mini-label">SYSTEM HALTED</div><h2>RUN <em>PAUSED</em></h2><p>The track is frozen. Resume when ready.</p><button id="resumeBtn" class="primary" type="button">RESUME RUN ➜</button><button id="quitBtn" class="text-button" type="button">QUIT TO MENU</button></div></div>
+   <div class="screen hidden" id="endScreen"><div class="glass-modal compact"><div class="mini-label" id="endLabel">RUN COMPLETE</div><h2 id="endTitle">NICE <em>FLIGHT</em></h2><div class="result-grid"><div><small>DISTANCE</small><strong id="resultDist">0m</strong></div><div><small>SCORE</small><strong id="resultScore">0</strong></div><div><small>BEST COMBO</small><strong id="resultCombo">0x</strong></div></div><button id="retryBtn" class="primary" type="button">FLY AGAIN ➜</button><button id="menuBtn" class="text-button" type="button">CHANGE MODE</button></div></div>
+  </div>
+  <div class="dashboard"><div class="dash-progress"><div class="dash-top"><span id="integrityText">SHIELDS ◆ ◆ ◆</span><span id="comboText">COMBO 0×</span></div><div class="meter"><span id="energyBar" style="width:0%"></span></div><div class="meter-label"><span>FLUX ENERGY</span><span id="energyText">0% / BOOST AT 100%</span></div></div><button id="pauseBtn" class="pause-button" type="button" disabled>Ⅱ PAUSE</button></div>
+  <div class="mobile-controls" aria-label="Game movement and boost controls"><button id="leftBtn" class="move-button" type="button" aria-label="Move left">← <span>LEFT</span></button><button id="boostBtn" class="boost-button" type="button" disabled>⚡ BOOST <small>100%</small></button><button id="rightBtn" class="move-button" type="button" aria-label="Move right"><span>RIGHT</span> →</button></div>
+ </section>
+ <section class="below"><div class="how-card"><span class="mini-label">FLIGHT MANUAL / 01</span><h2>HOW TO <em>PLAY</em></h2><div class="steps"><div><b>01</b><strong>STEER</strong><p>Use ← → or A/D on your keyboard. On mobile, tap the left/right buttons or swipe across the track.</p></div><div><b>02</b><strong>DODGE & COLLECT</strong><p>Red barriers cost a shield. Glide through free lanes and grab cyan flux crystals to charge your boost.</p></div><div><b>03</b><strong>BOOST & SCORE</strong><p>Build 100% energy, then press SPACE or BOOST for 3.2 seconds of double points. Bigger combos earn more.</p></div></div></div><div class="about-card"><span class="mini-label">AN ORIGINAL ARCADE CREATION</span><h2>CREATED BY <em>CORNELIUS AURELIUS</em></h2><p>NEON SKYRAIL™ is an original free browser-based infinite hover racing game designed and created by <a href="https://corneliusaurelius.com/">Cornelius Aurelius</a>. Enjoy futuristic racing challenges on desktop, Chromebook, tablet and mobile with no downloads or account required.</p><p><a href="https://github.com/Cornelius-Aurelius/NEON-SKYRAIL">View the source on GitHub</a> · <a href="https://corneliusaurelius.com/">More games and projects</a></p></div></section>
+</main>
+<footer class="footer"><span>© <span id="year">2026</span> CORNELIUS AURELIUS. ORIGINAL GAME.</span><span>NEON SKYRAIL™ / BUILD 2.0</span></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="help-backdrop hidden" id="helpOverlay"><div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="closeHelp" class="close" type="button" aria-label="Close help">×</button><span class="mini-label">PILOT BRIEFING</span><h2 id="helpTitle">HOW TO FLY</h2><p>Stay on the Skyrail for as long as possible. Shift between three lanes to avoid red barriers. Every obstacle row leaves at least one safe lane.</p><p><b>Desktop:</b> Arrow keys or A / D to steer. Space to activate boost. P or Escape to pause.</p><p><b>Phone / tablet:</b> Use large movement buttons or swipe left/right across the track. Tap Boost when the energy meter fills.</p><p>Collect cyan flux diamonds to power your boost. Survive with three shields. Endless offers unlimited distance, Rush has a 90-second clock, and Training lets you practise without losing.</p><button id="helpOkay" class="primary" type="button">GOT IT ➜</button></div></div>
 </body>
 </html>
